@@ -1,10 +1,7 @@
 import React from "react";
+import style from "./style.module.css";
 
 class TextAreaComponent extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-
   state = {
     inputValue: "",
   };
@@ -15,15 +12,18 @@ class TextAreaComponent extends React.Component {
 
   render() {
     return (
-      <div className="input_component">
-        <label htmlFor={this.props.props}></label>
-        <textarea rows="7"
+      <div className={`${style.form__group} field`}>
+        <textarea
+          rows="7"
+          className={style.form__field}
           type="text"
-          name={this.props.props}
-          placeholder={this.props.props}
+          id={this.props.name}
+          name={this.props.name}
+          placeholder={this.props.name}
           value={this.inputValues}
           onChange={this.handleInputChange}
         />
+        <label className={style.form__label} htmlFor={this.props.name}></label>
       </div>
     );
   }

@@ -1,17 +1,13 @@
 import React from "react";
+import style from "./style.module.css";
 
 class Button extends React.Component {
-  constructor(props) {
-    super(props);
-    console.log(props);
-  }
-
   render() {
     return (
-        <button className="button" type="button">
-            {this.props.name}
-        </button>
-    )
+      <button className={style.button} type={`${this.props.name === "Сохранить" ? "submit" : "reset"}`}>
+        {this.props.name}
+      </button>
+    );
   }
 }
 
