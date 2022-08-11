@@ -1,13 +1,17 @@
+import React from 'react';
 import './App.css';
 import FormComponent from './components/FormComponent';
 
-function App() {
+class App extends React.Component {
 
-  return (
-    <div className="App">
-      <FormComponent />
-    </div>
-  );
+  render() {
+    return (
+      <div className="App">
+        <FormComponent />
+      </div>
+    );
+  }
 }
+
 
 export default App;
