@@ -34,7 +34,14 @@ class FormComponent extends React.Component {
       showErrMsg: false,
     },
     birthday: { title: BIRTHDAY, value: "", isEmpty: true },
-    phone: { title: PHONE, value: "", isEmpty: true },
+    phone: {
+      title: PHONE,
+      value: "",
+      isEmpty: true,
+      errorMsg: "phone format should be in 7-7777-77-77 ",
+      showErrMsg: false,
+      pattern: /\(?([0-9]{1})\)?[-]([0-9]{4})[-]([0-9]{2})[-]([0-9]{2})$/,
+    },
     site: {
       title: SITE,
       value: "",
@@ -48,9 +55,14 @@ class FormComponent extends React.Component {
     lastProject: { title: LAST_PROJECT, value: "", isEmpty: true },
   };
 
+  isSubmit = {
+    value: true,
+  };
+
   handleInputChange = (ev) => {
     const name = ev.target.name;
     const value = ev.target.value.trim();
+
     this.setState(() => ({
       [name]: {
         ...this.state[name],
@@ -58,6 +70,23 @@ class FormComponent extends React.Component {
         isEmpty: value ? false : true,
       },
     }));
+    if (name === PHONE) {
+      this.setState(() => ({
+        [name]: {
+          ...this.state[name],
+          value: value,
+          isEmpty: value ? false : true,
+          showErrMsg: this.isValidatePhone(value) ? false : true,
+        },
+      }));
+      this.isSubmit.value = this.isValidatePhone(value) ? true : false;
+    }
+  };
+
+  isValidatePhone = (str) => {
+    const pattern = this.state.phone.pattern;
+    if (str.length !== 12) return false;
+    return pattern.test(str);
   };
 
   handleSubmit = (ev) => {
@@ -70,7 +99,6 @@ class FormComponent extends React.Component {
   validate = () => {
     const firstName = this.state.firstName.value;
     const lastName = this.state.lastName.value;
-
     this.setState(() => ({
       firstName: {
         ...this.state.firstName,
@@ -81,6 +109,9 @@ class FormComponent extends React.Component {
         showErrMsg: this.isValidateCapitalize(lastName) ? false : true,
       },
     }));
+    if (!this.isValidateCapitalize(firstName) || !this.isValidateCapitalize(lastName)) {
+      return false;
+    }
 
     if (!this.validateURL()) {
       this.setState(() => ({
@@ -89,6 +120,7 @@ class FormComponent extends React.Component {
           showErrMsg: true,
         },
       }));
+      return false;
     }
     if (this.validateURL()) {
       this.setState(() => ({
@@ -101,6 +133,7 @@ class FormComponent extends React.Component {
     if (!this.checkEmptiesFileds()) {
       return false;
     }
+    if (!this.isSubmit.value) return false;
     return true;
   };
 
@@ -121,14 +154,10 @@ class FormComponent extends React.Component {
     const pattern = this.state.site.pattern;
     return pattern.test(this.state.site.value);
   };
-  onCancel = () =>{
-//todo cancel and phone validation
-  }
+
   render() {
     return (
       <>
-        {/* <pre>{JSON.stringify(this.state, undefined, 1)}</pre> */}
-
         <form className={style.container} onSubmit={this.handleSubmit}>
           <h2>{TITLE_FORM}</h2>
           <InputComponent
@@ -160,6 +189,8 @@ class FormComponent extends React.Component {
             type="tel"
             onChange={this.handleInputChange}
             isEmpty={this.state.phone.isEmpty}
+            errorMsg={this.state.phone.errorMsg}
+            showErrMsg={this.state.phone.showErrMsg}
           />
           <InputComponent
             name={SITE}

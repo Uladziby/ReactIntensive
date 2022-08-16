@@ -9,7 +9,6 @@ class TextAreaComponent extends React.Component {
 
   countSymbols = (e) => {
     const val = e.target.value;
-    console.log(val);
     this.setState({ lenMsg: val.length });
     if (this.state.lenMsg > 600) {
       this.setState({ ...this.state, isShowErr: true });
@@ -29,6 +28,7 @@ class TextAreaComponent extends React.Component {
             this.props.onChange(e);
             this.countSymbols(e);
           }}
+          required
         />
         <label className={style.form__label} htmlFor={this.props.name}></label>
         <span className={style.form_counter}>{this.state.lenMsg}/600</span>
