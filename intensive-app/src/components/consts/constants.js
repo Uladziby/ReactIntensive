@@ -10,6 +10,10 @@ export const BTN_SAVE = "Сохранить";
 export const BTN_CANCEL = "Отмена";
 export const TITLE_FORM = "Создание анкеты";
 export const EMPTY_MSG = "This field shouldn't be empty";
+export const ERROR_MSG_TEXT_AREA = "Max length is 600 symbols";
 
+export const LAST_PROJECT_TITLE = "Послдений проект";
+export const ABOUT_TITLE = "О мне";
+export const STACK_TITLE = "Стэк технологий";
 
 

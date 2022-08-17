@@ -3,23 +3,32 @@ import style from "./style.module.css";
 
 class ResultsForm extends React.Component {
   render() {
-    console.log(this.props.data);
-    const { data } = this.props;
+    const { firstName, lastName, birthday, phone, site, about, stack, lastProject } = this.props.data;
     return (
       <div className={style.container}>
         <h2>
-          {data[0].value} {data[1].value}
+          {firstName.value} {lastName.value}
         </h2>
         <div className={style.block}>
-          {data.map((elem, idx) => {
-            return idx > 1 ? (
-              <div className={style.element} key={idx}>
-                {elem.title} : {elem.value}
-              </div>
-            ) : (
-              ""
-            );
-          })}
+          <div className={style.element}>
+            <div className={style.element_title}> {birthday.title}</div> : {birthday.value}
+          </div>
+          <div className={style.element}>
+            <div className={style.element_title}> {phone.title}</div> : {phone.value}
+          </div>
+          <div className={style.element}>
+            <div className={style.element_title}> {site.title}</div> : {site.value}
+          </div>
+          <div className={style.element}>
+            <div className={style.element_title}> {about.title}</div> : <p className={style.areaField}>{about.value}</p>
+          </div>
+          <div className={style.element}>
+            <div className={style.element_title}> {stack.title}</div> : <p className={style.areaField}>{stack.value}</p>
+          </div>
+          <div className={style.element}>
+            <div className={style.element_title}> {lastProject.title}</div>:{" "}
+            <p className={style.areaField}>{lastProject.value}</p>
+          </div>
         </div>
       </div>
     );

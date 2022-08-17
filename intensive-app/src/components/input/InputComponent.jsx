@@ -5,7 +5,7 @@ import input_style from "./input.module.css";
 
 class InputComponent extends React.Component {
   render() {
-    const { isEmpty, placeholder, name, onChange, errorMsg, showErrMsg } = this.props;
+    const { isEmpty, placeholder, name, onChange, errorMsg, showErrMsg, value, maxlength } = this.props;
     return (
       <div className={style.form__group}>
         <input
@@ -13,8 +13,10 @@ class InputComponent extends React.Component {
           className={style.form__field}
           placeholder={placeholder}
           name={name}
+          value={value}
           onChange={onChange}
           id={name}
+          maxLength={maxlength}
         />
         <label className={style.form__label} htmlFor={name}>
           {placeholder}

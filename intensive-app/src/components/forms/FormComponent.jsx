@@ -5,17 +5,28 @@ import TextAreaComponent from "../input/TextAreaComponent";
 import style from "../style.module.css";
 import {
   ABOUT,
+  ABOUT_TITLE,
   BIRTHDAY,
   BTN_CANCEL,
   BTN_SAVE,
   FIRST_NAME,
   LAST_NAME,
   LAST_PROJECT,
+  LAST_PROJECT_TITLE,
   PHONE,
   SITE,
   STACK,
+  STACK_TITLE,
   TITLE_FORM,
 } from "../consts/constants";
+import {
+  addInputMask,
+  checkEmptiesFileds,
+  isValidateCapitalize,
+  isValidatePhone,
+  validateTextArea,
+  validateURL,
+} from "../utils/validateFunctions";
 
 class FormComponent extends React.Component {
   state = {
@@ -40,7 +51,6 @@ class FormComponent extends React.Component {
       isEmpty: true,
       errorMsg: "phone format should be in 7-7777-77-77 ",
       showErrMsg: false,
-      pattern: /\(?([0-9]{1})\)?[-]([0-9]{4})[-]([0-9]{2})[-]([0-9]{2})$/,
     },
     site: {
       title: SITE,
@@ -48,16 +58,13 @@ class FormComponent extends React.Component {
       isEmpty: true,
       errorMsg: "Incorrect URL",
       showErrMsg: false,
-      pattern: /^(https?):\/\/[^\s$.?#].[^\s]*$/,
     },
-    about: { title: ABOUT, value: "", isEmpty: true },
-    stack: { title: STACK, value: "", isEmpty: true },
-    lastProject: { title: LAST_PROJECT, value: "", isEmpty: true },
+    about: { title: ABOUT_TITLE, value: "", isEmpty: true },
+    stack: { title: STACK_TITLE, value: "", isEmpty: true },
+    lastProject: { title: LAST_PROJECT_TITLE, value: "", isEmpty: true },
   };
 
-  isSubmit = {
-    value: true,
-  };
+  isSubmit = true;
 
   handleInputChange = (ev) => {
     const name = ev.target.name;
@@ -71,28 +78,24 @@ class FormComponent extends React.Component {
       },
     }));
     if (name === PHONE) {
+      const newVal = addInputMask(value);
+      console.log(newVal, "val");
       this.setState(() => ({
         [name]: {
           ...this.state[name],
-          value: value,
-          isEmpty: value ? false : true,
-          showErrMsg: this.isValidatePhone(value) ? false : true,
+          value: newVal,
+          isEmpty: newVal ? false : true,
+          showErrMsg: isValidatePhone(value) ? false : true,
         },
       }));
-      this.isSubmit.value = this.isValidatePhone(value) ? true : false;
+      this.isSubmit = isValidatePhone(value) ? true : false;
     }
-  };
-
-  isValidatePhone = (str) => {
-    const pattern = this.state.phone.pattern;
-    if (str.length !== 12) return false;
-    return pattern.test(str);
   };
 
   handleSubmit = (ev) => {
     ev.preventDefault();
     if (this.validate()) {
-      this.props.showCompletetedForm(Object.values(this.state));
+      this.props.showCompletetedForm(this.state);
     }
   };
 
@@ -102,18 +105,18 @@ class FormComponent extends React.Component {
     this.setState(() => ({
       firstName: {
         ...this.state.firstName,
-        showErrMsg: this.isValidateCapitalize(firstName) ? false : true,
+        showErrMsg: isValidateCapitalize(firstName) ? false : true,
       },
       lastName: {
         ...this.state.lastName,
-        showErrMsg: this.isValidateCapitalize(lastName) ? false : true,
+        showErrMsg: isValidateCapitalize(lastName) ? false : true,
       },
     }));
-    if (!this.isValidateCapitalize(firstName) || !this.isValidateCapitalize(lastName)) {
+    if (!isValidateCapitalize(firstName) || !isValidateCapitalize(lastName)) {
       return false;
     }
 
-    if (!this.validateURL()) {
+    if (!validateURL(this.state.site.value)) {
       this.setState(() => ({
         site: {
           ...this.state.site,
@@ -122,7 +125,7 @@ class FormComponent extends React.Component {
       }));
       return false;
     }
-    if (this.validateURL()) {
+    if (validateURL(this.state.site.value)) {
       this.setState(() => ({
         site: {
           ...this.state.site,
@@ -130,34 +133,25 @@ class FormComponent extends React.Component {
         },
       }));
     }
-    if (!this.checkEmptiesFileds()) {
+    if (!checkEmptiesFileds(this.state)) {
       return false;
     }
-    if (!this.isSubmit.value) return false;
-    return true;
-  };
-
-  checkEmptiesFileds = () => {
-    return Object.values(this.state).every((elem) => elem.value.length !== 0);
-  };
-
-  isValidateCapitalize(str) {
-    if (str.length === 0) return false;
-    if (str[0].toUpperCase() === str[0]) {
-      return true;
+    if (
+      !validateTextArea(this.state.about.value) ||
+      !validateTextArea(this.state.stack.value) ||
+      !validateTextArea(this.state.lastProject.value)
+    ) {
+      return false;
     }
-    return false;
-  }
-
-  validateURL = () => {
-    // eslint-disable-next-line no-useless-escape
-    const pattern = this.state.site.pattern;
-    return pattern.test(this.state.site.value);
+    if (!this.isSubmit) return false;
+    return true;
   };
 
   render() {
     return (
       <>
+        {/*          { <pre>{JSON.stringify(this.state, undefined, 1)}</pre>}
+         */}
         <form className={style.container} onSubmit={this.handleSubmit}>
           <h2>{TITLE_FORM}</h2>
           <InputComponent
@@ -179,14 +173,16 @@ class FormComponent extends React.Component {
           <InputComponent
             name={BIRTHDAY}
             placeholder={"День рождения"}
-            type="date"
+            type={"date"}
             onChange={this.handleInputChange}
             isEmpty={this.state.birthday.isEmpty}
           />
           <InputComponent
             name={PHONE}
             placeholder={"Телефон"}
-            type="tel"
+            type={"tel"}
+            maxlength={"12"}
+            value={this.state.phone.value}
             onChange={this.handleInputChange}
             isEmpty={this.state.phone.isEmpty}
             errorMsg={this.state.phone.errorMsg}
@@ -200,9 +196,24 @@ class FormComponent extends React.Component {
             errorMsg={this.state.site.errorMsg}
             showErrMsg={this.state.site.showErrMsg}
           />
-          <TextAreaComponent name={ABOUT} onChange={this.handleInputChange} />
-          <TextAreaComponent name={STACK} onChange={this.handleInputChange} />
-          <TextAreaComponent name={LAST_PROJECT} onChange={this.handleInputChange} />
+          <TextAreaComponent
+            name={ABOUT}
+            placeholder={this.state.about.title}
+            value={this.state.about.value}
+            onChange={this.handleInputChange}
+          />
+          <TextAreaComponent
+            name={STACK}
+            placeholder={this.state.stack.title}
+            value={this.state.stack.value}
+            onChange={this.handleInputChange}
+          />
+          <TextAreaComponent
+            name={LAST_PROJECT}
+            placeholder={this.state.lastProject.title}
+            value={this.state.lastProject.value}
+            onChange={this.handleInputChange}
+          />
           <div className={style.btns_group}>
             <Button name={BTN_SAVE} />
             <Button name={BTN_CANCEL} />
