@@ -90,6 +90,7 @@ input::placeholder {
   background-color: #38ef7d;
   box-shadow: inset 0 0 0 #571212, 0 0 1.5em #38ef7d;
 }
+
 .form_counter {
   font-size: 1rem;
   color: #38ef7d;

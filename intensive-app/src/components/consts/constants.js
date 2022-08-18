@@ -15,5 +15,5 @@ export const ERROR_MSG_TEXT_AREA = "Max length is 600 symbols";
 export const LAST_PROJECT_TITLE = "Послдений проект";
 export const ABOUT_TITLE = "О мне";
 export const STACK_TITLE = "Стэк технологий";
-
+export const SUCCESS_MSG = "Succes! Form completed";
 
