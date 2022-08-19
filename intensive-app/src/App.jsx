@@ -9,13 +9,24 @@ import PopUpNotification from "./components/modals/PopUpNotification";
 const App = () => {
   const [dataForm, setDataForm] = useState("");
   const [isShowForm, setShowForm] = useState(false);
+  const [isShowPopUp, setShowPopUp] = useState(false);
+
   const showCompletetedForm = (data) => {
     setDataForm(data);
-    setShowForm(true);
+    setShowPopUp(true);
   };
+
   useEffect(() => {
-    console.log(dataForm);
-  });
+    if (dataForm) {
+      let id = setTimeout(() => {
+        setShowForm(true);
+      }, 3000);
+      return () => {
+        clearTimeout(id);
+      };
+    }
+  }, [dataForm, isShowPopUp]);
+
   return (
     <div className="App">
       {isShowForm ? (
@@ -23,10 +34,7 @@ const App = () => {
       ) : (
         <FormComponent showCompletetedForm={showCompletetedForm} />
       )}
-      <PopUpNotification
-        isShowPopUp={isShowForm}
-        setIsShowPopUp={setShowForm}
-      />
+      <PopUpNotification isShowPopUp={isShowPopUp} setShowPopUp={setShowPopUp} />
     </div>
   );
 };

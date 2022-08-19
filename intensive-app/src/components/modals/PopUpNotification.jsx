@@ -5,28 +5,42 @@ import btnStyle from "../style.module.css";
 import { SUCCESS_MSG } from "../consts/constants";
 import Button from "../buttons/Button";
 import icon from "../../assets/success.svg";
+import { useEffect, useRef } from "react";
 
-const Template = ({ closePopUp }) => {
+const PopUpTemplate = ({ closePopUp }) => {
+  let timerID;
+  const popup = useRef(null);
+
+  useEffect(() => {
+    setTimeout(() => {
+      popup.current.style = `${styles.active}`;
+    }, 1000);
+    timerID = setTimeout(closePopUp, 4000);
+    return () => {
+      clearTimeout(timerID);
+    };
+  });
+  
   return (
-    <div className={styles.popup}>
-      <div className={styles.popup_content}>
+    <div className={`${styles.popup} `}>
+      <div ref={popup} className={`${styles.popup_content} ${styles.active}`}>
         <div className={styles.popup_content_block}>
-        <img src={icon} alt="icon" width="50"/>
-        <div className={styles.title}>{SUCCESS_MSG}</div>
+          <img src={icon} alt="icon" width="50" />
+          <div className={styles.title}>{SUCCESS_MSG}</div>
         </div>
-        <Button className={btnStyle.button} onClick={closePopUp} name={'Close'} />
+        <Button className={btnStyle.button} onClick={closePopUp} name={"Close"} />
       </div>
     </div>
   );
 };
 
-const PopUpNotification = ({ isShowPopUp, setIsShowPopUp }) => {
+const PopUpNotification = ({ isShowPopUp, setShowPopUp }) => {
   const closePopUp = () => {
-    setIsShowPopUp(true);
+    setShowPopUp(false);
   };
-  const domNode = document.getElementById("root");
-  if (domNode && !isShowPopUp) {
-    return ReactDOM.createPortal(<Template closePopUp={closePopUp} />, domNode);
+  const rootNode = document.getElementById("root");
+  if (rootNode && isShowPopUp) {
+    return ReactDOM.createPortal(<PopUpTemplate closePopUp={closePopUp} />, rootNode);
   }
 };
 

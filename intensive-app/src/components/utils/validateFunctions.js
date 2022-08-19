@@ -1,3 +1,17 @@
+export const validate = (state, firstName, lastName) => {
+    if (!isValidateCapitalize(firstName) || !isValidateCapitalize(lastName)) return false;
+    if (!validateURL(state.site.value)) return false;
+    if (!checkEmptiesFileds(state)) return false;
+    if (
+        !validateTextArea(state.about.value) ||
+        !validateTextArea(state.stack.value) ||
+        !validateTextArea(state.lastProject.value)
+    ) {
+        return false;
+    }
+    return true;
+};
+
 export function checkEmptiesFileds(state) {
     return Object.values(state).every((elem) => elem.value.length !== 0);
 };
@@ -48,3 +62,5 @@ export function addInputMask(data) {
     }
     return result;
 }
+
+

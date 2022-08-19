@@ -21,207 +21,178 @@ import {
 } from "../consts/constants";
 import {
   addInputMask,
-  checkEmptiesFileds,
   isValidateCapitalize,
   isValidatePhone,
-  validateTextArea,
+  validate,
   validateURL,
 } from "../utils/validateFunctions";
+import { useState } from "react";
 
-class FormComponent extends React.Component {
-  state = {
-    firstName: {
-      title: FIRST_NAME,
-      value: "",
-      isEmpty: true,
-      errorMsg: "The first character must be upper case",
-      showErrMsg: false,
-    },
-    lastName: {
-      title: LAST_NAME,
-      value: "",
-      isEmpty: true,
-      errorMsg: "The first character must be upper case",
-      showErrMsg: false,
-    },
-    birthday: { title: BIRTHDAY, value: "", isEmpty: true },
-    phone: {
-      title: PHONE,
-      value: "",
-      isEmpty: true,
-      errorMsg: "phone format should be in 7-7777-77-77 ",
-      showErrMsg: false,
-    },
-    site: {
-      title: SITE,
-      value: "",
-      isEmpty: true,
-      errorMsg: "Incorrect URL",
-      showErrMsg: false,
-    },
-    about: { title: ABOUT_TITLE, value: "", isEmpty: true },
-    stack: { title: STACK_TITLE, value: "", isEmpty: true },
-    lastProject: { title: LAST_PROJECT_TITLE, value: "", isEmpty: true },
-  };
+const initialState = {
+  firstName: {
+    title: FIRST_NAME,
+    value: "",
+    isEmpty: true,
+    errorMsg: "The first character must be upper case",
+    showErrMsg: false,
+  },
+  lastName: {
+    title: LAST_NAME,
+    value: "",
+    isEmpty: true,
+    errorMsg: "The first character must be upper case",
+    showErrMsg: false,
+  },
+  birthday: { title: BIRTHDAY, value: "", isEmpty: true },
+  phone: {
+    title: PHONE,
+    value: "",
+    isEmpty: true,
+    errorMsg: "phone format should be in 7-7777-77-77 ",
+    showErrMsg: false,
+  },
+  site: {
+    title: SITE,
+    value: "",
+    isEmpty: true,
+    errorMsg: "Incorrect URL",
+    showErrMsg: false,
+  },
+  about: { title: ABOUT_TITLE, value: "", isEmpty: true },
+  stack: { title: STACK_TITLE, value: "", isEmpty: true },
+  lastProject: { title: LAST_PROJECT_TITLE, value: "", isEmpty: true },
+};
 
-  isSubmit = true;
+function FormComponent({ showCompletetedForm }) {
+  const [state, setState] = useState(initialState);
 
-  handleInputChange = (ev) => {
+  const handleInputChange = (ev) => {
     const name = ev.target.name;
     const value = ev.target.value.trim();
 
-    this.setState(() => ({
+    setState((prev) => ({
+      ...prev,
       [name]: {
-        ...this.state[name],
+        ...prev[name],
         value: value,
         isEmpty: value ? false : true,
       },
     }));
+
     if (name === PHONE) {
-      const newVal = addInputMask(value);
-      console.log(newVal, "val");
-      this.setState(() => ({
-        [name]: {
-          ...this.state[name],
-          value: newVal,
-          isEmpty: newVal ? false : true,
+      const maskVal = addInputMask(value);
+      setState((prev) => ({
+        ...prev,
+        phone: {
+          ...prev.phone,
+          value: maskVal,
+          isEmpty: maskVal ? false : true,
           showErrMsg: isValidatePhone(value) ? false : true,
         },
       }));
-      this.isSubmit = isValidatePhone(value) ? true : false;
     }
   };
 
-  handleSubmit = (ev) => {
+  const handleSubmit = (ev) => {
     ev.preventDefault();
-    if (this.validate()) {
-      this.props.showCompletetedForm(this.state);
-    }
-  };
 
-  validate = () => {
-    const firstName = this.state.firstName.value;
-    const lastName = this.state.lastName.value;
-    this.setState(() => ({
+    const firstName = state.firstName.value;
+    const lastName = state.lastName.value;
+
+    setState((prev) => ({
+      ...prev,
       firstName: {
-        ...this.state.firstName,
+        ...prev.firstName,
         showErrMsg: isValidateCapitalize(firstName) ? false : true,
       },
       lastName: {
-        ...this.state.lastName,
+        ...prev.lastName,
         showErrMsg: isValidateCapitalize(lastName) ? false : true,
       },
+      site: {
+        ...prev.site,
+        showErrMsg: validateURL(prev.site.value) ? false : true,
+      },
     }));
-    if (!isValidateCapitalize(firstName) || !isValidateCapitalize(lastName)) {
-      return false;
-    }
 
-    if (!validateURL(this.state.site.value)) {
-      this.setState(() => ({
-        site: {
-          ...this.state.site,
-          showErrMsg: true,
-        },
-      }));
-      return false;
-    }
-    if (validateURL(this.state.site.value)) {
-      this.setState(() => ({
-        site: {
-          ...this.state.site,
-          showErrMsg: false,
-        },
-      }));
-    }
-    if (!checkEmptiesFileds(this.state)) {
-      return false;
-    }
-    if (
-      !validateTextArea(this.state.about.value) ||
-      !validateTextArea(this.state.stack.value) ||
-      !validateTextArea(this.state.lastProject.value)
-    ) {
-      return false;
-    }
-    if (!this.isSubmit) return false;
-    return true;
+    if (validate(state, firstName, lastName)) showCompletetedForm(state);
   };
 
-  render() {
-    return (
-      <>
-        {/*          { <pre>{JSON.stringify(this.state, undefined, 1)}</pre>}
-         */}
-        <form className={style.container} onSubmit={this.handleSubmit}>
-          <h2>{TITLE_FORM}</h2>
-          <InputComponent
-            name={FIRST_NAME}
-            placeholder={"Имя"}
-            onChange={this.handleInputChange}
-            isEmpty={this.state.firstName.isEmpty}
-            errorMsg={this.state.firstName.errorMsg}
-            showErrMsg={this.state.firstName.showErrMsg}
-          />
-          <InputComponent
-            name={LAST_NAME}
-            placeholder={"Фамилия"}
-            onChange={this.handleInputChange}
-            isEmpty={this.state.lastName.isEmpty}
-            errorMsg={this.state.lastName.errorMsg}
-            showErrMsg={this.state.lastName.showErrMsg}
-          />
-          <InputComponent
-            name={BIRTHDAY}
-            placeholder={"День рождения"}
-            type={"date"}
-            onChange={this.handleInputChange}
-            isEmpty={this.state.birthday.isEmpty}
-          />
-          <InputComponent
-            name={PHONE}
-            placeholder={"Телефон"}
-            type={"tel"}
-            maxlength={"12"}
-            value={this.state.phone.value}
-            onChange={this.handleInputChange}
-            isEmpty={this.state.phone.isEmpty}
-            errorMsg={this.state.phone.errorMsg}
-            showErrMsg={this.state.phone.showErrMsg}
-          />
-          <InputComponent
-            name={SITE}
-            placeholder={"Сайт"}
-            onChange={this.handleInputChange}
-            isEmpty={this.state.site.isEmpty}
-            errorMsg={this.state.site.errorMsg}
-            showErrMsg={this.state.site.showErrMsg}
-          />
-          <TextAreaComponent
-            name={ABOUT}
-            placeholder={this.state.about.title}
-            value={this.state.about.value}
-            onChange={this.handleInputChange}
-          />
-          <TextAreaComponent
-            name={STACK}
-            placeholder={this.state.stack.title}
-            value={this.state.stack.value}
-            onChange={this.handleInputChange}
-          />
-          <TextAreaComponent
-            name={LAST_PROJECT}
-            placeholder={this.state.lastProject.title}
-            value={this.state.lastProject.value}
-            onChange={this.handleInputChange}
-          />
-          <div className={style.btns_group}>
-            <Button name={BTN_SAVE} />
-            <Button name={BTN_CANCEL} />
-          </div>
-        </form>
-      </>
-    );
-  }
+  return (
+    <>
+      {/*{<pre>{JSON.stringify(state, undefined, 1)}</pre>}*/}
+
+      <form className={style.container} onSubmit={handleSubmit}>
+        <h2>{TITLE_FORM}</h2>
+        <InputComponent
+          name={FIRST_NAME}
+          placeholder={"Имя"}
+          value={state.firstName.value}
+          onChange={handleInputChange}
+          isEmpty={state.firstName.isEmpty}
+          errorMsg={state.firstName.errorMsg}
+          showErrMsg={state.firstName.showErrMsg}
+        />
+        <InputComponent
+          name={LAST_NAME}
+          placeholder={"Фамилия"}
+          value={state.lastName.value}
+          onChange={handleInputChange}
+          isEmpty={state.lastName.isEmpty}
+          errorMsg={state.lastName.errorMsg}
+          showErrMsg={state.lastName.showErrMsg}
+        />
+        <InputComponent
+          name={BIRTHDAY}
+          placeholder={"День рождения"}
+          type={"date"}
+          onChange={handleInputChange}
+          isEmpty={state.birthday.isEmpty}
+        />
+        <InputComponent
+          name={PHONE}
+          placeholder={"Телефон"}
+          type={"tel"}
+          maxlength={"12"}
+          value={state.phone.value}
+          onChange={handleInputChange}
+          isEmpty={state.phone.isEmpty}
+          errorMsg={state.phone.errorMsg}
+          showErrMsg={state.phone.showErrMsg}
+        />
+        <InputComponent
+          name={SITE}
+          placeholder={"Сайт"}
+          onChange={handleInputChange}
+          isEmpty={state.site.isEmpty}
+          errorMsg={state.site.errorMsg}
+          showErrMsg={state.site.showErrMsg}
+        />
+        <TextAreaComponent
+          name={ABOUT}
+          placeholder={state.about.title}
+          value={state.about.value}
+          onChange={handleInputChange}
+        />
+        <TextAreaComponent
+          name={STACK}
+          placeholder={state.stack.title}
+          value={state.stack.value}
+          onChange={handleInputChange}
+        />
+        <TextAreaComponent
+          name={LAST_PROJECT}
+          placeholder={state.lastProject.title}
+          value={state.lastProject.value}
+          onChange={handleInputChange}
+        />
+        <div className={style.btns_group}>
+          <Button name={BTN_SAVE} />
+          <Button name={BTN_CANCEL} />
+        </div>
+      </form>
+    </>
+  );
 }
 
 export default FormComponent;
