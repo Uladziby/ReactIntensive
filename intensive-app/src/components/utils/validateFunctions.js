@@ -1,14 +1,11 @@
 export const validate = (state, firstName, lastName) => {
-    if (!isValidateCapitalize(firstName) || !isValidateCapitalize(lastName)) return false;
-    if (!validateURL(state.site.value)) return false;
-    if (!checkEmptiesFileds(state)) return false;
-    if (
-        !validateTextArea(state.about.value) ||
-        !validateTextArea(state.stack.value) ||
-        !validateTextArea(state.lastProject.value)
-    ) {
-        return false;
-    }
+    if (!isValidateCapitalize(firstName)
+        || !isValidateCapitalize(lastName)
+        || !validateURL(state.site.value)
+        || !checkEmptiesFileds(state)
+        || !validateTextArea(state.about.value)
+        || !validateTextArea(state.stack.value)
+        || !validateTextArea(state.lastProject.value)) return false;
     return true;
 };
 
@@ -37,7 +34,7 @@ export function isValidatePhone(str) {
 
 export function validateTextArea(data) {
     const maxLen = 600;
-    return data.length < maxLen ? true : false;
+    return data.length < maxLen;
 }
 
 export function addInputMask(data) {
